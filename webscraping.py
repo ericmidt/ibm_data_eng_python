@@ -12,7 +12,22 @@ soup = BeautifulSoup(html_data, 'html5lib')
 with open('webscraping.html', 'w', encoding='utf-8') as f:
     f.write(soup.prettify())
 
-tag_object = soup.table.prettify()
+# Get third table
+table = soup.find_all('table')[2]
 
-with open('table.html', 'w', encoding='utf-8') as f:
-    f.write(tag_object)
+table_html = table.prettify()
+
+with open("table.html", "w", encoding="utf-8") as f:
+    f.write(table_html)
+
+data = pd.DataFrame(columns=["Name", "Market Cap (US$ Billion)"])
+
+for row in table.find_all('tr'):
+    columns = row.find_all('td')
+    for column in columns:
+        print(column.string)
+    # name = col[1].string
+    # market_cap = col[3].string
+    # data = data.append({"Name": name, "Market Cap (US$ Billion)": market_cap}, ignore_index=True)
+
+print(data.head())
