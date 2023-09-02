@@ -7,6 +7,8 @@ html_data = requests.get("https://web.archive.org/web/20200318083015/https://en.
 print(html_data)
 html_data = html_data.text
 
+
+
 soup = BeautifulSoup(html_data, 'html5lib')
 
 with open('webscraping.html', 'w', encoding='utf-8') as f:
@@ -20,14 +22,18 @@ table_html = table.prettify()
 with open("table.html", "w", encoding="utf-8") as f:
     f.write(table_html)
 
-data = pd.DataFrame(columns=["Name", "Market Cap (US$ Billion)"])
+data_list = []
 
 for row in table.find_all('tr'):
     columns = row.find_all('td')
-    for column in columns:
-        print(column.string)
-    # name = col[1].string
-    # market_cap = col[3].string
-    # data = data.append({"Name": name, "Market Cap (US$ Billion)": market_cap}, ignore_index=True)
+    if len(columns) >= 3:
+        name = columns[1].find_all('a')[1].text.strip()
+        market_cap = columns[2].text.strip()  # Extract the market cap
+        data_list.append({"Name": name, "Market Cap (US$ Billion)": market_cap})
 
-print(data.head())
+df = pd.DataFrame(data_list)
+
+print(df.head())
+
+json_file_path = 'banks_data.json'
+df.to_json(json_file_path, orient='records')
